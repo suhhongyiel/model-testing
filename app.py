@@ -93,6 +93,7 @@ uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 if uploaded_file is not None:
     # CSV 파일 읽기
     data = pd.read_csv(uploaded_file)
+    data.fillna(data.mean(), inplace=True)
 
     # 데이터 전처리
     st.write("Original Data:")
@@ -146,11 +147,19 @@ if uploaded_file is not None:
             output = model(X_padded)
             predictions = torch.sigmoid(output).numpy()
 
-        # 결과 출력
-        st.write("Predictions (Class 1 Probabilities):")
-        for i, pred in enumerate(predictions):
-            st.write(f"Sequence {i+1}: {pred[0]:.2f} (Class 1 Probability)")
-            if pred >= 0.5:
-                st.write(f"Sequence {i+1} is classified as: **Class 1**")
-            else:
-                st.write(f"Sequence {i+1} is classified as: **Class 0**")
+        # 결과를 DataFrame으로 변환
+        result_df = pd.DataFrame({
+            'Sample': range(1, len(predictions) + 1),
+            'Class 1 Probability': [f"{pred[0]:.2f}" for pred in predictions],
+            'Predicted Class': ['Class 1' if pred >= 0.5 else 'Class 0' for pred in predictions]
+        })
+
+        # 결과를 표로 표시
+        st.write("Inference Results:")
+        st.dataframe(result_df)
+
+        # 요약된 결과 표시
+        num_class_1 = result_df['Predicted Class'].value_counts().get('Class 1', 0)
+        num_class_0 = result_df['Predicted Class'].value_counts().get('Class 0', 0)
+        st.write(f"Number of samples classified as **Class 1**: {num_class_1}")
+        st.write(f"Number of samples classified as **Class 0**: {num_class_0}")
