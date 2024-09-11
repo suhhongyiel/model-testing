@@ -107,9 +107,6 @@ if uploaded_file is not None:
     st.write("Original Data:")
     st.dataframe(data.head())  # 데이터를 표로 표시
 
-    # 결측값 처리
-    data.fillna(data.mean(), inplace=True)
-
     # user_id 별로 데이터 그룹화
     if 'user_id' in data.columns:
         user_groups = data.groupby('user_id')
