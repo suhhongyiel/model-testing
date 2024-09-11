@@ -69,7 +69,7 @@ class SimpleRNN(nn.Module):
 def load_model(model_name, model_path, input_dim, hidden_dim, output_dim, num_layers):
     if model_name == "GRU":
         model = SimpleGRU(input_dim, hidden_dim, output_dim, num_layers)
-        model_path = 'GRU_model.pt'
+        model_path = f'{model_name}.pt'
         model.load_state_dict(torch.load(model_path))
         model.eval()  # 모델을 평가 모드로 전환
         return model
