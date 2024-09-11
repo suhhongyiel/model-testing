@@ -4,7 +4,9 @@ import torch
 import numpy as np
 from torch.nn.utils.rnn import pad_sequence
 import torch.nn as nn
-
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 # 모델 정의
 class SimpleGRU(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
@@ -101,6 +103,29 @@ if uploaded_file is not None:
     # 'Output' 값이 2인 경우 0으로 치환 (필요한 경우)
     if 'Output' in data.columns:
         data['Output'] = data['Output'].replace(2, 0)
+
+
+
+
+    # Output 라벨 분포 확인
+    st.write("Output Label Distribution:")
+    label_counts = data['Output'].value_counts()
+
+    # Output 라벨 분포를 표로 출력
+    st.write(label_counts)
+
+    # Output 라벨 분포를 시각화 (막대 그래프)
+    fig, ax = plt.subplots()
+    label_counts.plot(kind='bar', ax=ax)
+    ax.set_title('Distribution of Output Labels')
+    ax.set_xlabel('Output Label')
+    ax.set_ylabel('Count')
+    st.pyplot(fig)
+
+
+
+
+
 
     # 'Sequence' 열 생성
     data['Sequence'] = None
