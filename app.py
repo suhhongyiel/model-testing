@@ -105,20 +105,20 @@ if uploaded_file is not None:
 
 
 
-    # Output 라벨 분포 확인
-    st.write("Output Label Distribution:")
-    label_counts = data['Output'].value_counts()
+    # # Output 라벨 분포 확인
+    # st.write("Output Label Distribution:")
+    # label_counts = data['Output'].value_counts()
 
-    # Output 라벨 분포를 표로 출력
-    st.write(label_counts)
+    # # Output 라벨 분포를 표로 출력
+    # st.write(label_counts)
 
-    # Output 라벨 분포를 시각화 (막대 그래프)
-    fig, ax = plt.subplots()
-    label_counts.plot(kind='bar', ax=ax)
-    ax.set_title('Distribution of Output Labels')
-    ax.set_xlabel('Output Label')
-    ax.set_ylabel('Count')
-    st.pyplot(fig)
+    # # Output 라벨 분포를 시각화 (막대 그래프)
+    # fig, ax = plt.subplots()
+    # label_counts.plot(kind='bar', ax=ax)
+    # ax.set_title('Distribution of Output Labels')
+    # ax.set_xlabel('Output Label')
+    # ax.set_ylabel('Count')
+    # st.pyplot(fig)
 
 
 
@@ -156,9 +156,9 @@ if uploaded_file is not None:
         group = group[selected_columns]
         X.append(torch.tensor(group.values, dtype=torch.float32))
 
-        # 각 시퀀스의 raw 데이터를 Streamlit에 표시
-        st.write(f"Raw data for Sequence {name}:")
-        st.dataframe(group)  # 시퀀스별 데이터 테이블로 표시
+        # # 각 시퀀스의 raw 데이터를 Streamlit에 표시
+        # st.write(f"Raw data for Sequence {name}:")
+        # st.dataframe(group)  # 시퀀스별 데이터 테이블로 표시
 
     # 시퀀스 데이터를 패딩 (길이가 다를 경우 대비)
     X_padded = pad_sequence(X, batch_first=True)
