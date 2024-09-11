@@ -28,6 +28,7 @@ class SimpleLSTM(nn.Module):
         output = self.fc(lstm_out[:, -1, :])  # 마지막 시퀀스의 출력을 사용
         return output
 
+# Attention-LSTM 모델 정의
 class AttentionLSTM(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
         super(AttentionLSTM, self).__init__()
@@ -61,6 +62,7 @@ def load_model(model_name, model_path, input_dim, hidden_dim, output_dim, num_la
         model = SimpleLSTM(input_dim, hidden_dim, output_dim, num_layers)
     elif model_name == "Attention-LSTM":
         hidden_dim = 32  # 이전 설정에서 사용한 hidden_dim
+        num_layers = 1  # 학습 시 사용한 num_layers
         model = AttentionLSTM(input_dim, hidden_dim, output_dim, num_layers)
     elif model_name == "RNN":
         model = SimpleRNN(input_dim, hidden_dim, output_dim, num_layers)
