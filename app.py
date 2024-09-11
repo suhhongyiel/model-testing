@@ -81,6 +81,10 @@ if uploaded_file is not None:
         group = group[selected_columns]
         X.append(torch.tensor(group.values, dtype=torch.float32))
 
+        # 각 시퀀스의 raw 데이터를 Streamlit에 표시
+        st.write(f"Raw data for Sequence {name}:")
+        st.dataframe(group)  # 시퀀스별 데이터 테이블로 표시
+
     # 시퀀스 데이터를 패딩 (길이가 다를 경우 대비)
     X_padded = pad_sequence(X, batch_first=True)
 
