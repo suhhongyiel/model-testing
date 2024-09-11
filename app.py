@@ -28,7 +28,7 @@ st.title("GRU Model Inference Web App")
 
 # 학습된 모델 로드
 model_path = "gru_model.pt"  # 저장된 모델 경로
-input_dim = 14  # 선택한 입력 차원 수 (선택한 열의 개수)
+input_dim = 15  # 선택한 입력 차원 수 (선택한 열의 개수)
 hidden_dim = 8  # 이전 설정에서 사용한 hidden_dim
 output_dim = 1  # 출력 차원 (이진 분류)
 num_layers = 2  # GRU 레이어 수
