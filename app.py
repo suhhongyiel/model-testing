@@ -4,8 +4,6 @@ import torch
 import numpy as np
 from torch.nn.utils.rnn import pad_sequence
 import torch.nn as nn
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 # 모델 정의
 class SimpleGRU(nn.Module):
