@@ -93,8 +93,7 @@ uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 if uploaded_file is not None:
     # CSV 파일 읽기
     data = pd.read_csv(uploaded_file)
-    data.fillna(data.mean(), inplace=True)
-    
+    # data.fillna(data.mean(), inplace=True)
     # 데이터 전처리
     st.write("Original Data:")
     st.write(data.head())
