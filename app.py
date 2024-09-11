@@ -5,35 +5,84 @@ import numpy as np
 from torch.nn.utils.rnn import pad_sequence
 import torch.nn as nn
 
+# 모델 정의
+class SimpleGRU(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
+        super(SimpleGRU, self).__init__()
+        self.gru = nn.GRU(input_dim, hidden_dim, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        gru_out, _ = self.gru(x)
+        output = self.fc(gru_out[:, -1, :])  # 마지막 시퀀스의 출력을 사용
+        return output
+
+class SimpleLSTM(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
+        super(SimpleLSTM, self).__init__()
+        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        lstm_out, _ = self.lstm(x)
+        output = self.fc(lstm_out[:, -1, :])  # 마지막 시퀀스의 출력을 사용
+        return output
+
+class AttentionLSTM(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
+        super(AttentionLSTM, self).__init__()
+        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
+        self.attention = nn.Linear(hidden_dim, 1)
+        self.fc = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        lstm_out, _ = self.lstm(x)
+        attention_weights = torch.softmax(self.attention(lstm_out), dim=1)
+        context_vector = torch.sum(attention_weights * lstm_out, dim=1)
+        output = self.fc(context_vector)
+        return output
+
+class SimpleRNN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
+        super(SimpleRNN, self).__init__()
+        self.rnn = nn.RNN(input_dim, hidden_dim, num_layers, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        rnn_out, _ = self.rnn(x)
+        output = self.fc(rnn_out[:, -1, :])  # 마지막 시퀀스의 출력을 사용
+        return output
+
 # 모델 로드 함수
-def load_model_pt(model_path, input_dim, hidden_dim, output_dim, num_layers):
-    class SimpleGRU(nn.Module):
-        def __init__(self, input_dim, hidden_dim, output_dim, num_layers=1):
-            super(SimpleGRU, self).__init__()
-            self.gru = nn.GRU(input_dim, hidden_dim, num_layers, batch_first=True)
-            self.fc = nn.Linear(hidden_dim, output_dim)
-
-        def forward(self, x):
-            gru_out, _ = self.gru(x)
-            output = self.fc(gru_out[:, -1, :])  # 마지막 시퀀스의 출력을 사용
-            return output
-
-    model = SimpleGRU(input_dim=input_dim, hidden_dim=hidden_dim, output_dim=output_dim, num_layers=num_layers)
+def load_model(model_name, model_path, input_dim, hidden_dim, output_dim, num_layers):
+    if model_name == "GRU":
+        model = SimpleGRU(input_dim, hidden_dim, output_dim, num_layers)
+    elif model_name == "LSTM":
+        model = SimpleLSTM(input_dim, hidden_dim, output_dim, num_layers)
+    elif model_name == "Attention-LSTM":
+        model = AttentionLSTM(input_dim, hidden_dim, output_dim, num_layers)
+    elif model_name == "RNN":
+        model = SimpleRNN(input_dim, hidden_dim, output_dim, num_layers)
+        
+    model_path = model_name + '_model.pt'
     model.load_state_dict(torch.load(model_path))
     model.eval()  # 모델을 평가 모드로 전환
     return model
 
 # Streamlit 웹 애플리케이션 시작
-st.title("GRU Model Inference Web App")
+st.title("Model Inference Web App")
+
+# 모델 선택
+model_name = st.selectbox("Choose a model", ["GRU", "LSTM", "Attention-LSTM", "RNN"])
 
 # 학습된 모델 로드
-model_path = "gru_model.pt"  # 저장된 모델 경로
+model_path = "model.pt"  # 각 모델에 맞는 가중치 파일 경로를 지정해야 함
 input_dim = 15  # 선택한 입력 차원 수 (선택한 열의 개수)
 hidden_dim = 8  # 이전 설정에서 사용한 hidden_dim
 output_dim = 1  # 출력 차원 (이진 분류)
-num_layers = 2  # GRU 레이어 수
+num_layers = 2  # 모델 레이어 수
 
-model = load_model_pt(model_path, input_dim, hidden_dim, output_dim, num_layers)
+model = load_model(model_name, model_path, input_dim, hidden_dim, output_dim, num_layers)
 
 # 파일 업로드
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
@@ -95,5 +144,10 @@ if uploaded_file is not None:
             predictions = torch.sigmoid(output).numpy()
 
         # 결과 출력
-        st.write("Predictions:")
-        st.write(predictions)
+        st.write("Predictions (Class 1 Probabilities):")
+        for i, pred in enumerate(predictions):
+            st.write(f"Sequence {i+1}: {pred[0]:.2f} (Class 1 Probability)")
+            if pred >= 0.5:
+                st.write(f"Sequence {i+1} is classified as: **Class 1**")
+            else:
+                st.write(f"Sequence {i+1} is classified as: **Class 0**")
