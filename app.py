@@ -60,6 +60,7 @@ def load_model(model_name, model_path, input_dim, hidden_dim, output_dim, num_la
     elif model_name == "LSTM":
         model = SimpleLSTM(input_dim, hidden_dim, output_dim, num_layers)
     elif model_name == "Attention-LSTM":
+        hidden_dim = 32  # 이전 설정에서 사용한 hidden_dim
         model = AttentionLSTM(input_dim, hidden_dim, output_dim, num_layers)
     elif model_name == "RNN":
         model = SimpleRNN(input_dim, hidden_dim, output_dim, num_layers)
